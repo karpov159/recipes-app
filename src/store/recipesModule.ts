@@ -1,13 +1,36 @@
-import type { Store as VuexStore, DispatchOptions, CommitOptions } from 'vuex';
+import type {
+	Store as VuexStore,
+	DispatchOptions,
+	CommitOptions,
+	GetterTree,
+	ActionTree,
+	MutationTree,
+} from 'vuex';
+import axios from 'axios';
 
 import type RecipeData from '@/types/interfaces/recipe.interface';
 import type ModulesName from '@/types/modulesName';
 
-interface Mutations {}
+interface Mutations {
+	setRecipes(state: RecipesState, recipes: RecipeData[]): void;
+}
 
-interface Actions {}
+interface Actions {
+	fetchRecipes(
+		context: AugmentedActionContext,
+		query: string
+	): Promise<ResponseApi>;
+	getRecipes(context: AugmentedActionContext, query: string): void;
+}
 
 interface Getters {}
+
+interface ResponseApi {
+	number: number;
+	offset: number;
+	results: RecipeData[];
+	totalResults: number;
+}
 
 type NamespacedMutations = Namespaced<Mutations, ModulesName.RECIPES>;
 type NamespacedGetters = Namespaced<Getters, ModulesName.RECIPES>;
@@ -16,6 +39,19 @@ type NamespacedActions = Namespaced<Actions, ModulesName.RECIPES>;
 type Namespaced<T, N extends string> = {
 	[P in keyof T & string as `${N}/${P}`]: T[P];
 };
+
+interface AugmentedActionContext {
+	commit<K extends keyof Mutations>(
+		key: K,
+		payload: Parameters<Mutations[K]>[1]
+	): ReturnType<Mutations[K]>;
+	state: RecipesState;
+	dispatch<K extends keyof Actions>(
+		key: K,
+		payload: Parameters<Actions[K]>[1],
+		options?: DispatchOptions
+	): ReturnType<Actions[K]>;
+}
 
 export interface RecipesState {
 	allRecipes: RecipeData[];
@@ -47,9 +83,9 @@ export type Store<S = RecipesState> = Omit<
 
 interface RecipesModule {
 	state: () => RecipesState;
-	getters: {};
-	mutations: {};
-	actions: {};
+	getters: GetterTree<RecipesState, RecipesState> & Getters;
+	mutations: MutationTree<RecipesState> & Mutations;
+	actions: ActionTree<RecipesState, RecipesState> & Actions;
 	namespaced: boolean;
 }
 
@@ -58,8 +94,39 @@ const recipesModule: RecipesModule = {
 		allRecipes: [],
 	}),
 	getters: {},
-	mutations: {},
-	actions: {},
+	mutations: {
+		setRecipes(state, recipes) {
+			state.allRecipes = recipes;
+		},
+	},
+	actions: {
+		async fetchRecipes(context, query) {
+			try {
+				const response = await axios.get(
+					'https://api.spoonacular.com/recipes/complexSearch',
+					{
+						params: {
+							apiKey: 'a0eb9f69a5b84518ac4032f20a005969',
+							query,
+							offset: 0,
+							number: 20,
+						},
+					}
+				);
+
+				const data = await response.data;
+
+				return data;
+			} catch (error) {
+				throw error;
+			}
+		},
+		getRecipes({ dispatch, commit }, query) {
+			dispatch('fetchRecipes', query).then((res) => {
+				commit('setRecipes', res.results);
+			});
+		},
+	},
 	namespaced: true,
 };
 

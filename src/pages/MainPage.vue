@@ -1,50 +1,51 @@
 <template>
 	<div class="main">
 		<h1 class="main__title">Recipes App</h1>
-		{{ state.searchQuery }}
-		<input
-			v-model="state.searchQuery"
-			class="main__input"
-			placeholder="Search for recipes"
-			type="text"
-		/>
+
+		<div class="main__search">
+			<input
+				@keyup.enter="submit"
+				v-model="state.searchQuery"
+				class="main__input"
+				placeholder="Search for recipes"
+				type="text"
+			/>
+			<SearchIcon @click="submit" />
+		</div>
+
+		<div class="recipes">
+			<RecipeItem
+				v-for="recipe in recipes"
+				:recipe="recipe"
+				:key="recipe.id"
+			/>
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
-import axios from 'axios';
+import SearchIcon from '@/components/Icons/SearchIcon.vue';
+import RecipeItem from '@/components/RecipeItem.vue';
+import { useStore } from '@/store';
+import { computed, onMounted, reactive } from 'vue';
 
 interface MainPageState {
 	searchQuery: string;
 }
 
+const store = useStore();
+
+const recipes = computed(() => store.state.recipes.allRecipes);
+
 const state: MainPageState = reactive({
 	searchQuery: '',
 });
 
-const fetchRecepies = async () => {
-	try {
-		const response = await axios.get(
-			'https://api.spoonacular.com/recipes/complexSearch',
-			{
-				params: {
-					apiKey: 'a0eb9f69a5b84518ac4032f20a005969',
-					query: 'chicken',
-					offset: 100,
-				},
-			}
-		);
-
-		console.log(response.data);
-	} catch (error) {
-		throw error;
-	}
+const submit = () => {
+	store.dispatch('recipes/getRecipes', state.searchQuery);
 };
 
-onMounted(() => {
-	fetchRecepies();
-});
+onMounted(() => {});
 </script>
 
 <style scoped>
@@ -60,11 +61,29 @@ onMounted(() => {
 }
 
 .main__input {
-	padding: 20px;
+	padding: 20px 50px 20px 20px;
 	font-size: 18px;
 	width: 500px;
 	height: 60px;
 	border-radius: 10px;
-	margin-top: 30px;
+}
+
+.main__search {
+	position: relative;
+	margin-top: 20px;
+}
+
+.recipes {
+	width: 100%;
+	display: grid;
+	justify-content: space-between;
+	margin-top: 20px;
+	grid-row-gap: 30px;
+	grid-column-gap: 15px;
+	-webkit-column-gap: 15px;
+	column-gap: 15px;
+	grid-auto-rows: 300px;
+	grid-template-columns: repeat(auto-fill, 350px);
+	row-gap: 30px;
 }
 </style>
