@@ -10,6 +10,7 @@
 				placeholder="Search for recipes"
 				type="text"
 			/>
+
 			<SearchIcon @click="submit" />
 		</div>
 
@@ -20,6 +21,13 @@
 				:key="recipe.id"
 			/>
 		</div>
+
+		<div
+			v-if="recipes.length > 0"
+			v-intersection="loadMoreRecipes"
+			ref="obs"
+			class="observer"
+		></div>
 	</div>
 </template>
 
@@ -27,7 +35,7 @@
 import SearchIcon from '@/components/Icons/SearchIcon.vue';
 import RecipeItem from '@/components/RecipeItem.vue';
 import { useStore } from '@/store';
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 interface MainPageState {
 	searchQuery: string;
@@ -35,17 +43,26 @@ interface MainPageState {
 
 const store = useStore();
 
+const obs = ref<HTMLDivElement | null>(null);
+
 const recipes = computed(() => store.state.recipes.allRecipes);
+const currentPage = computed(() => store.state.recipes.currentPage);
+const changeCurrentPage = (num: number) =>
+	store.commit('recipes/changeCurrentPage', num);
+const loadMoreRecipes = () => store.dispatch('recipes/loadMoreRecipes');
 
 const state: MainPageState = reactive({
 	searchQuery: '',
 });
 
 const submit = () => {
-	store.dispatch('recipes/getRecipes', state.searchQuery);
-};
+	changeCurrentPage(1);
 
-onMounted(() => {});
+	store.dispatch('recipes/getRecipes', {
+		query: state.searchQuery,
+		currentPage: currentPage.value,
+	});
+};
 </script>
 
 <style scoped>

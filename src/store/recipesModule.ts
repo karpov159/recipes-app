@@ -11,16 +11,24 @@ import axios from 'axios';
 import type RecipeData from '@/types/interfaces/recipe.interface';
 import type ModulesName from '@/types/modulesName';
 
+interface ActionPayload {
+	query: string;
+	currentPage: number;
+}
+
 interface Mutations {
 	setRecipes(state: RecipesState, recipes: RecipeData[]): void;
+	changeCurrentPage(state: RecipesState, page: number): void;
+	setLastSearchQuery(state: RecipesState, query: string): void;
 }
 
 interface Actions {
 	fetchRecipes(
 		context: AugmentedActionContext,
-		query: string
+		payload: ActionPayload
 	): Promise<ResponseApi>;
-	getRecipes(context: AugmentedActionContext, query: string): void;
+	getRecipes(context: AugmentedActionContext, payload: ActionPayload): void;
+	loadMoreRecipes(context: AugmentedActionContext): void;
 }
 
 interface Getters {}
@@ -55,6 +63,8 @@ interface AugmentedActionContext {
 
 export interface RecipesState {
 	allRecipes: RecipeData[];
+	currentPage: number;
+	lastSearchQuery: string;
 }
 
 export type Store<S = RecipesState> = Omit<
@@ -92,15 +102,23 @@ interface RecipesModule {
 const recipesModule: RecipesModule = {
 	state: () => ({
 		allRecipes: [],
+		currentPage: 1,
+		lastSearchQuery: '',
 	}),
 	getters: {},
 	mutations: {
 		setRecipes(state, recipes) {
 			state.allRecipes = recipes;
 		},
+		changeCurrentPage(state, page) {
+			state.currentPage = page;
+		},
+		setLastSearchQuery(state, query) {
+			state.lastSearchQuery = query;
+		},
 	},
 	actions: {
-		async fetchRecipes(context, query) {
+		async fetchRecipes(context, { currentPage, query }) {
 			try {
 				const response = await axios.get(
 					'https://api.spoonacular.com/recipes/complexSearch',
@@ -108,8 +126,8 @@ const recipesModule: RecipesModule = {
 						params: {
 							apiKey: 'a0eb9f69a5b84518ac4032f20a005969',
 							query,
-							offset: 0,
-							number: 20,
+							offset: currentPage * 18 - 18,
+							number: 18,
 						},
 					}
 				);
@@ -121,9 +139,21 @@ const recipesModule: RecipesModule = {
 				throw error;
 			}
 		},
-		getRecipes({ dispatch, commit }, query) {
-			dispatch('fetchRecipes', query).then((res) => {
+		getRecipes({ dispatch, commit }, payload) {
+			commit('setLastSearchQuery', payload.query);
+
+			dispatch('fetchRecipes', payload).then((res) => {
 				commit('setRecipes', res.results);
+			});
+		},
+		loadMoreRecipes({ dispatch, commit, state }) {
+			commit('changeCurrentPage', state.currentPage + 1);
+
+			dispatch('fetchRecipes', {
+				query: state.lastSearchQuery,
+				currentPage: state.currentPage,
+			}).then((res) => {
+				commit('setRecipes', [...state.allRecipes, ...res.results]);
 			});
 		},
 	},
