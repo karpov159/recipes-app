@@ -20,6 +20,7 @@ interface Mutations {
 	setRecipes(state: RecipesState, recipes: RecipeData[]): void;
 	changeCurrentPage(state: RecipesState, page: number): void;
 	setLastSearchQuery(state: RecipesState, query: string): void;
+	setLoading(state: RecipesState, bool: boolean): void;
 }
 
 interface Actions {
@@ -65,6 +66,7 @@ export interface RecipesState {
 	allRecipes: RecipeData[];
 	currentPage: number;
 	lastSearchQuery: string;
+	isLoading: boolean;
 }
 
 export type Store<S = RecipesState> = Omit<
@@ -104,6 +106,7 @@ const recipesModule: RecipesModule = {
 		allRecipes: [],
 		currentPage: 1,
 		lastSearchQuery: '',
+		isLoading: false,
 	}),
 	getters: {},
 	mutations: {
@@ -115,6 +118,9 @@ const recipesModule: RecipesModule = {
 		},
 		setLastSearchQuery(state, query) {
 			state.lastSearchQuery = query;
+		},
+		setLoading(state, bool) {
+			state.isLoading = bool;
 		},
 	},
 	actions: {
@@ -142,18 +148,28 @@ const recipesModule: RecipesModule = {
 		getRecipes({ dispatch, commit }, payload) {
 			commit('setLastSearchQuery', payload.query);
 
+			commit('setLoading', true);
+
+			commit('setRecipes', []);
+
 			dispatch('fetchRecipes', payload).then((res) => {
 				commit('setRecipes', res.results);
+
+				commit('setLoading', false);
 			});
 		},
 		loadMoreRecipes({ dispatch, commit, state }) {
 			commit('changeCurrentPage', state.currentPage + 1);
+
+			commit('setLoading', true);
 
 			dispatch('fetchRecipes', {
 				query: state.lastSearchQuery,
 				currentPage: state.currentPage,
 			}).then((res) => {
 				commit('setRecipes', [...state.allRecipes, ...res.results]);
+
+				commit('setLoading', false);
 			});
 		},
 	},

@@ -14,13 +14,9 @@
 			<SearchIcon @click="submit" />
 		</div>
 
-		<div class="recipes">
-			<RecipeItem
-				v-for="recipe in recipes"
-				:recipe="recipe"
-				:key="recipe.id"
-			/>
-		</div>
+		<RecipeList :recipes="recipes" />
+
+		<Spinner v-if="isLoading" />
 
 		<div
 			v-if="recipes.length > 0"
@@ -33,7 +29,8 @@
 
 <script setup lang="ts">
 import SearchIcon from '@/components/Icons/SearchIcon.vue';
-import RecipeItem from '@/components/RecipeItem.vue';
+import RecipeList from '@/components/RecipeList.vue';
+import Spinner from '@/components/Spinner.vue';
 import { useStore } from '@/store';
 import { computed, reactive, ref } from 'vue';
 
@@ -47,6 +44,7 @@ const obs = ref<HTMLDivElement | null>(null);
 
 const recipes = computed(() => store.state.recipes.allRecipes);
 const currentPage = computed(() => store.state.recipes.currentPage);
+const isLoading = computed(() => store.state.recipes.isLoading);
 const changeCurrentPage = (num: number) =>
 	store.commit('recipes/changeCurrentPage', num);
 const loadMoreRecipes = () => store.dispatch('recipes/loadMoreRecipes');
@@ -72,9 +70,12 @@ const submit = () => {
 	justify-content: center;
 	align-items: center;
 	padding-top: 30px;
+	padding-bottom: 100px;
 }
 .main__title {
 	text-align: center;
+	font-size: 34px;
+	color: rgb(248, 184, 65);
 }
 
 .main__input {
@@ -83,24 +84,15 @@ const submit = () => {
 	width: 500px;
 	height: 60px;
 	border-radius: 10px;
+	border: 2px solid rgb(248, 184, 65);
+}
+
+.main__input:focus {
+	outline: 1px solid rgb(248, 184, 65);
 }
 
 .main__search {
 	position: relative;
 	margin-top: 20px;
-}
-
-.recipes {
-	width: 100%;
-	display: grid;
-	justify-content: space-between;
-	margin-top: 20px;
-	grid-row-gap: 30px;
-	grid-column-gap: 15px;
-	-webkit-column-gap: 15px;
-	column-gap: 15px;
-	grid-auto-rows: 300px;
-	grid-template-columns: repeat(auto-fill, 350px);
-	row-gap: 30px;
 }
 </style>

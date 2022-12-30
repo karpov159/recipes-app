@@ -15,5 +15,6 @@ svg {
 	right: 15px;
 	top: 50%;
 	transform: translateY(-50%);
+	fill: #f8b841;
 }
 </style>

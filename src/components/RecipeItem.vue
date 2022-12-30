@@ -1,5 +1,5 @@
 <template>
-	<div class="recipe">
+	<div @click="router.push(`/recipes/${recipe.id}`)" class="recipe">
 		<img
 			class="recipe__img"
 			:src="`${recipe.image}`"
@@ -11,6 +11,9 @@
 
 <script setup lang="ts">
 import type RecipeData from '@/types/interfaces/recipe.interface';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 defineProps<{
 	recipe: RecipeData;
@@ -19,19 +22,29 @@ defineProps<{
 
 <style scoped>
 .recipe {
-	height: 300px;
+	height: 250px;
 	position: relative;
 	width: 350px;
+	cursor: pointer;
 }
 
 .recipe__title {
+	color: #fff;
 	font-size: 18px;
+	position: absolute;
 	text-align: center;
+	width: 50%;
+	margin: auto;
+	top: 50%;
+	transform: translateY(-50%);
+	left: 0;
+	right: 0;
 }
 
 .recipe__img {
 	width: 100%;
-	height: 250px;
+	height: 100%;
 	border-radius: 10px;
+	filter: brightness(60%);
 }
 </style>

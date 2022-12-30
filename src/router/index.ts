@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import MainPage from '@/pages/MainPage.vue';
+import { MainPage, RecipePage } from '@/pages';
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,6 +8,11 @@ const router = createRouter({
 			path: '/',
 			name: 'main',
 			component: MainPage,
+		},
+		{
+			path: '/recipes/:recipeID',
+			name: 'recipe-page',
+			component: RecipePage,
 		},
 	],
 });
