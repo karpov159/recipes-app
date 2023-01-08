@@ -8,8 +8,8 @@ import type {
 } from 'vuex';
 import axios from 'axios';
 
-import type RecipeData from '@/types/interfaces/recipe.interface';
 import type ModulesName from '@/types/modulesName';
+import type { RecipeData } from '@/types/interfaces';
 
 interface ActionPayload {
 	query: string;
@@ -21,6 +21,8 @@ interface Mutations {
 	changeCurrentPage(state: RecipesState, page: number): void;
 	setLastSearchQuery(state: RecipesState, query: string): void;
 	setLoading(state: RecipesState, bool: boolean): void;
+	setFiltersOpened(state: RecipesState, bool: boolean): void;
+	setFilterQuery(state: RecipesState, query: string): void;
 }
 
 interface Actions {
@@ -67,6 +69,8 @@ export interface RecipesState {
 	currentPage: number;
 	lastSearchQuery: string;
 	isLoading: boolean;
+	isFiltersOpened: boolean;
+	filterQuery: string;
 }
 
 export type Store<S = RecipesState> = Omit<
@@ -107,6 +111,8 @@ const recipesModule: RecipesModule = {
 		currentPage: 1,
 		lastSearchQuery: '',
 		isLoading: false,
+		isFiltersOpened: false,
+		filterQuery: '',
 	}),
 	getters: {},
 	mutations: {
@@ -122,9 +128,15 @@ const recipesModule: RecipesModule = {
 		setLoading(state, bool) {
 			state.isLoading = bool;
 		},
+		setFiltersOpened(state, bool) {
+			state.isFiltersOpened = bool;
+		},
+		setFilterQuery(state, query) {
+			state.filterQuery = query;
+		},
 	},
 	actions: {
-		async fetchRecipes(context, { currentPage, query }) {
+		async fetchRecipes({ state }, { currentPage, query }) {
 			try {
 				const response = await axios.get(
 					'https://api.spoonacular.com/recipes/complexSearch',
@@ -134,6 +146,7 @@ const recipesModule: RecipesModule = {
 							query,
 							offset: currentPage * 18 - 18,
 							number: 18,
+							cuisine: state.filterQuery,
 						},
 					}
 				);

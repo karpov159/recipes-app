@@ -19,6 +19,10 @@ import { RouterView } from 'vue-router';
 	margin: 0;
 	padding: 0;
 }
+
+:root {
+	--main-color: rgb(248, 184, 65);
+}
 </style>
 
 <style scoped>
