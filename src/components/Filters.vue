@@ -1,6 +1,7 @@
 <template>
-	<div class="filters">
+	<div @click.stop class="filters">
 		<h2 class="filters__title">Select search terms</h2>
+
 		<div @click="closeFilters" className="filters__close">&times;</div>
 
 		<h4 class="filters__subtitle">Cuisine</h4>
@@ -149,6 +150,10 @@ const updateCuisineList = (id: string) => {
 const setFiltersOpened = (bool: boolean) =>
 	store.commit('recipes/setFiltersOpened', bool);
 
+const getRecipes = () => {
+	store.dispatch('recipes/getRecipes', store.state.recipes.lastSearchQuery);
+};
+
 const closeFilters = () => {
 	setFiltersOpened(false);
 };
@@ -160,6 +165,8 @@ const saveFilters = () => {
 		.join(', ');
 
 	setFilterQuery(filterQuery);
+
+	getRecipes();
 
 	closeFilters();
 };

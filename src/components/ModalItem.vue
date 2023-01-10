@@ -1,10 +1,16 @@
 <template>
 	<transition name="modal">
-		<div class="modal">
+		<div @click="closeModal" class="modal">
 			<slot></slot>
 		</div>
 	</transition>
 </template>
+
+<script setup lang="ts">
+defineProps<{
+	closeModal: () => void;
+}>();
+</script>
 
 <style scoped>
 .modal {

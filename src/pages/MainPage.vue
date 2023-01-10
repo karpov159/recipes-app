@@ -1,18 +1,18 @@
 <template>
-	<div class="main">
+	<section class="main">
 		<h1 class="main__title">Recipes App</h1>
 
 		<div class="main__tools">
 			<div class="main__search">
 				<input
-					@keyup.enter="submit"
+					@keyup.enter="getRecipes"
 					v-model="state.searchQuery"
 					class="main__input"
 					placeholder="Search for recipes"
 					type="text"
 				/>
 
-				<SearchIcon @click="submit" />
+				<SearchIcon @click="getRecipes" />
 			</div>
 
 			<div class="main__filter">
@@ -22,7 +22,7 @@
 
 		<RecipeList :recipes="recipes" />
 
-		<ModalItem v-show="isFiltersOpened">
+		<ModalItem v-show="isFiltersOpened" :closeModal="closeFilters">
 			<Filters />
 		</ModalItem>
 
@@ -34,7 +34,7 @@
 			ref="obs"
 			class="observer"
 		></div>
-	</div>
+	</section>
 </template>
 
 <script setup lang="ts">
@@ -45,7 +45,7 @@ import Spinner from '@/components/Spinner.vue';
 import ModalItem from '@/components/ModalItem.vue';
 import Filters from '@/components/Filters.vue';
 import { useStore } from '@/store';
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 interface MainPageState {
 	searchQuery: string;
@@ -56,11 +56,9 @@ const store = useStore();
 const obs = ref<HTMLDivElement | null>(null);
 
 const recipes = computed(() => store.state.recipes.allRecipes);
-const currentPage = computed(() => store.state.recipes.currentPage);
 const isLoading = computed(() => store.state.recipes.isLoading);
 const isFiltersOpened = computed(() => store.state.recipes.isFiltersOpened);
-const changeCurrentPage = (num: number) =>
-	store.commit('recipes/changeCurrentPage', num);
+
 const loadMoreRecipes = () => store.dispatch('recipes/loadMoreRecipes');
 const setFiltersOpened = (bool: boolean) =>
 	store.commit('recipes/setFiltersOpened', bool);
@@ -69,18 +67,21 @@ const state: MainPageState = reactive({
 	searchQuery: '',
 });
 
-const submit = () => {
-	changeCurrentPage(1);
-
-	store.dispatch('recipes/getRecipes', {
-		query: state.searchQuery,
-		currentPage: currentPage.value,
-	});
+const getRecipes = () => {
+	store.dispatch('recipes/getRecipes', state.searchQuery);
 };
 
 const openFilters = () => {
 	setFiltersOpened(true);
 };
+
+const closeFilters = () => {
+	setFiltersOpened(false);
+};
+
+onMounted(() => {
+	getRecipes();
+});
 </script>
 
 <style scoped>

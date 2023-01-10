@@ -11,11 +11,6 @@ import axios from 'axios';
 import type ModulesName from '@/types/modulesName';
 import type { RecipeData } from '@/types/interfaces';
 
-interface ActionPayload {
-	query: string;
-	currentPage: number;
-}
-
 interface Mutations {
 	setRecipes(state: RecipesState, recipes: RecipeData[]): void;
 	changeCurrentPage(state: RecipesState, page: number): void;
@@ -28,9 +23,9 @@ interface Mutations {
 interface Actions {
 	fetchRecipes(
 		context: AugmentedActionContext,
-		payload: ActionPayload
+		query: string
 	): Promise<ResponseApi>;
-	getRecipes(context: AugmentedActionContext, payload: ActionPayload): void;
+	getRecipes(context: AugmentedActionContext, query: string): void;
 	loadMoreRecipes(context: AugmentedActionContext): void;
 }
 
@@ -136,7 +131,7 @@ const recipesModule: RecipesModule = {
 		},
 	},
 	actions: {
-		async fetchRecipes({ state }, { currentPage, query }) {
+		async fetchRecipes({ state }, query) {
 			try {
 				const response = await axios.get(
 					'https://api.spoonacular.com/recipes/complexSearch',
@@ -144,7 +139,7 @@ const recipesModule: RecipesModule = {
 						params: {
 							apiKey: 'a0eb9f69a5b84518ac4032f20a005969',
 							query,
-							offset: currentPage * 18 - 18,
+							offset: state.currentPage * 18 - 18,
 							number: 18,
 							cuisine: state.filterQuery,
 						},
@@ -158,14 +153,16 @@ const recipesModule: RecipesModule = {
 				throw error;
 			}
 		},
-		getRecipes({ dispatch, commit }, payload) {
-			commit('setLastSearchQuery', payload.query);
+		getRecipes({ dispatch, commit }, query) {
+			commit('changeCurrentPage', 1);
+
+			commit('setLastSearchQuery', query);
 
 			commit('setLoading', true);
 
 			commit('setRecipes', []);
 
-			dispatch('fetchRecipes', payload).then((res) => {
+			dispatch('fetchRecipes', query).then((res) => {
 				commit('setRecipes', res.results);
 
 				commit('setLoading', false);
@@ -176,10 +173,7 @@ const recipesModule: RecipesModule = {
 
 			commit('setLoading', true);
 
-			dispatch('fetchRecipes', {
-				query: state.lastSearchQuery,
-				currentPage: state.currentPage,
-			}).then((res) => {
+			dispatch('fetchRecipes', state.lastSearchQuery).then((res) => {
 				commit('setRecipes', [...state.allRecipes, ...res.results]);
 
 				commit('setLoading', false);
