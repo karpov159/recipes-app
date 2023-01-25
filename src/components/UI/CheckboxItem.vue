@@ -29,6 +29,12 @@ const onClick = () => {
 };
 </script>
 
+<script lang="ts">
+export default {
+	name: 'CheckboxItem',
+};
+</script>
+
 <style scoped>
 .checkbox {
 	display: flex;

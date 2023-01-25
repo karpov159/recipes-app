@@ -7,12 +7,12 @@
 		<h4 class="filters__subtitle">Cuisine</h4>
 
 		<div class="filters__options">
-			<CheckboxItem
+			<checkbox-item
 				v-for="cuisine in Object.values(state.cuisineList)"
 				@update:value="updateCuisineList"
 				:cuisine="cuisine"
 				:key="cuisine.id"
-			/>
+			></checkbox-item>
 		</div>
 
 		<button class="filters__button" @click="saveFilters">
@@ -22,10 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store';
+import { useStore } from '@/core/store';
 import { reactive } from 'vue';
 import type { CuisineData } from '@/types/interfaces';
-import CheckboxItem from './UI/CheckboxItem.vue';
 
 interface StateData {
 	cuisineList: Record<string, CuisineData>;

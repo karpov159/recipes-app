@@ -1,14 +1,10 @@
+<template>
+	<RouterView />
+</template>
+
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
 </script>
-
-<template>
-	<div class="app">
-		<div class="container">
-			<RouterView />
-		</div>
-	</div>
-</template>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap');
@@ -22,12 +18,9 @@ import { RouterView } from 'vue-router';
 
 :root {
 	--main-color: rgb(248, 184, 65);
-}
-</style>
-
-<style scoped>
-.container {
-	width: 1140px;
-	margin: 0 auto;
+	--second-color: rgb(9, 107, 219);
+	--text-color: rgb(90, 87, 87);
+	--bg-color: rgb(248, 248, 248);
+	--component-paddings: 50px;
 }
 </style>

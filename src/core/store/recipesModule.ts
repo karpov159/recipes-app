@@ -7,9 +7,10 @@ import type {
 	MutationTree,
 } from 'vuex';
 import axios from 'axios';
+import { API_KEY, PATHS, BASE_URL } from '@/shared/constants';
 
 import type ModulesName from '@/types/modulesName';
-import type { RecipeData } from '@/types/interfaces';
+import type { RecipeData, RecipeInfo } from '@/types/interfaces';
 
 interface Mutations {
 	setRecipes(state: RecipesState, recipes: RecipeData[]): void;
@@ -18,23 +19,30 @@ interface Mutations {
 	setLoading(state: RecipesState, bool: boolean): void;
 	setFiltersOpened(state: RecipesState, bool: boolean): void;
 	setFilterQuery(state: RecipesState, query: string): void;
+	setBrowsedRecipe(state: RecipesState, recipe: RecipeInfo): void;
+	setActiveTab(state: RecipesState, name: string): void;
 }
 
 interface Actions {
 	fetchRecipes(
 		context: AugmentedActionContext,
 		query: string
-	): Promise<ResponseApi>;
+	): Promise<ResponseApi<RecipeData>>;
 	getRecipes(context: AugmentedActionContext, query: string): void;
 	loadMoreRecipes(context: AugmentedActionContext): void;
+	fetchRecipe(
+		context: AugmentedActionContext,
+		id: string
+	): Promise<RecipeInfo>;
+	setRecipe(context: AugmentedActionContext, id: string): void;
 }
 
 interface Getters {}
 
-interface ResponseApi {
+interface ResponseApi<T> {
 	number: number;
 	offset: number;
-	results: RecipeData[];
+	results: T[];
 	totalResults: number;
 }
 
@@ -66,6 +74,8 @@ export interface RecipesState {
 	isLoading: boolean;
 	isFiltersOpened: boolean;
 	filterQuery: string;
+	browsedRecipe: RecipeInfo;
+	activeTab: string;
 }
 
 export type Store<S = RecipesState> = Omit<
@@ -108,6 +118,8 @@ const recipesModule: RecipesModule = {
 		isLoading: false,
 		isFiltersOpened: false,
 		filterQuery: '',
+		browsedRecipe: {} as RecipeInfo,
+		activeTab: 'Recipes',
 	}),
 	getters: {},
 	mutations: {
@@ -129,22 +141,25 @@ const recipesModule: RecipesModule = {
 		setFilterQuery(state, query) {
 			state.filterQuery = query;
 		},
+		setBrowsedRecipe(state, recipe) {
+			state.browsedRecipe = recipe;
+		},
+		setActiveTab(state, name) {
+			state.activeTab = name;
+		},
 	},
 	actions: {
 		async fetchRecipes({ state }, query) {
 			try {
-				const response = await axios.get(
-					'https://api.spoonacular.com/recipes/complexSearch',
-					{
-						params: {
-							apiKey: 'a0eb9f69a5b84518ac4032f20a005969',
-							query,
-							offset: state.currentPage * 18 - 18,
-							number: 18,
-							cuisine: state.filterQuery,
-						},
-					}
-				);
+				const response = await axios.get(PATHS.complexSearch, {
+					params: {
+						apiKey: API_KEY,
+						query,
+						offset: state.currentPage * 18 - 18,
+						number: 18,
+						cuisine: state.filterQuery,
+					},
+				});
 
 				const data = await response.data;
 
@@ -153,7 +168,7 @@ const recipesModule: RecipesModule = {
 				throw error;
 			}
 		},
-		getRecipes({ dispatch, commit }, query) {
+		async getRecipes({ dispatch, commit }, query) {
 			commit('changeCurrentPage', 1);
 
 			commit('setLastSearchQuery', query);
@@ -168,7 +183,7 @@ const recipesModule: RecipesModule = {
 				commit('setLoading', false);
 			});
 		},
-		loadMoreRecipes({ dispatch, commit, state }) {
+		async loadMoreRecipes({ dispatch, commit, state }) {
 			commit('changeCurrentPage', state.currentPage + 1);
 
 			commit('setLoading', true);
@@ -177,6 +192,29 @@ const recipesModule: RecipesModule = {
 				commit('setRecipes', [...state.allRecipes, ...res.results]);
 
 				commit('setLoading', false);
+			});
+		},
+		async fetchRecipe({ commit }, id) {
+			try {
+				const response = await axios.get(
+					`${BASE_URL}/recipes/${id}/information`,
+					{
+						params: {
+							apiKey: API_KEY,
+						},
+					}
+				);
+
+				const data = await response.data;
+
+				return data;
+			} catch (error) {
+				throw error;
+			}
+		},
+		async setRecipe({ dispatch, commit }, id) {
+			dispatch('fetchRecipe', id).then((res) => {
+				commit('setBrowsedRecipe', res);
 			});
 		},
 	},

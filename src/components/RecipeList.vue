@@ -1,7 +1,7 @@
 <template>
-	<div class="recipes">
+	<div class="recipes__list">
 		<transition-group name="recipe-list">
-			<RecipeItem
+			<CardItem
 				v-for="recipe in recipes"
 				:recipe="recipe"
 				:key="recipe.id"
@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import type { RecipeData } from '@/types/interfaces';
-import RecipeItem from './RecipeItem.vue';
+import CardItem from './CardItem.vue';
 
 defineProps<{
 	recipes: RecipeData[];
@@ -20,7 +20,7 @@ defineProps<{
 </script>
 
 <style scoped>
-.recipes {
+.recipes__list {
 	width: 100%;
 	display: grid;
 	justify-content: space-between;
