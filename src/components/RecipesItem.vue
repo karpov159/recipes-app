@@ -10,21 +10,21 @@
 					type="text"
 				/>
 
-				<SearchIcon @click="getRecipes" />
+				<search-icon @click="getRecipes" />
 			</div>
 
 			<div class="recipes__filter-icon">
-				<FilterIcon @click="openFilters" />
+				<filter-icon @click="openFilters" />
 			</div>
 		</div>
 
-		<RecipeList :recipes="recipes" />
+		<recipe-list :recipes="recipes" />
 
-		<ModalItem v-show="isFiltersOpened" :closeModal="closeFilters">
-			<FiltersMenu />
-		</ModalItem>
+		<modal-item v-show="isFiltersOpened" :closeModal="closeFilters">
+			<filters-menu />
+		</modal-item>
 
-		<SpinnerItem v-if="isLoading" />
+		<spinner-item v-if="isLoading" />
 
 		<div
 			v-if="recipes.length > 0"
@@ -77,9 +77,9 @@ const closeFilters = () => {
 	setFiltersOpened(false);
 };
 
-// onMounted(() => {
-// 	getRecipes();
-// });
+onMounted(() => {
+	getRecipes();
+});
 </script>
 
 <style scoped>

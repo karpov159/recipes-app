@@ -1,7 +1,7 @@
 <template>
 	<div class="recipes__list">
 		<transition-group name="recipe-list">
-			<CardItem
+			<card-item
 				v-for="recipe in recipes"
 				:recipe="recipe"
 				:key="recipe.id"

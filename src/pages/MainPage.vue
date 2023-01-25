@@ -1,7 +1,7 @@
 <template>
 	<section class="main">
-		<SideMenu />
-		<RouterView />
+		<side-menu />
+		<router-view />
 	</section>
 </template>
 
