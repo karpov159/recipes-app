@@ -90,6 +90,7 @@ onMounted(() => {
 	background-color: var(--bg-color);
 	width: 100%;
 	height: 100%;
+	overflow-y: auto;
 }
 
 .recipes__tools {
