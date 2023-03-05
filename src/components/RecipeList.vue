@@ -11,7 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import type { RecipeData } from '@/types/interfaces';
+import type { RecipeData } from '@/models';
+
 import CardItem from './CardItem.vue';
 
 defineProps<{

@@ -10,8 +10,9 @@
 </template>
 
 <script setup lang="ts">
-import type { RecipeData } from '@/types/interfaces';
 import { useRouter } from 'vue-router';
+
+import type { RecipeData } from '@/models';
 
 const router = useRouter();
 

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { MainPage } from '@/pages';
+
 import { MAIN, RECIPE_PAGE, FAVORITE } from '@/core/config/RoutesConfig';
+import { MainPage } from '@/pages';
 import RecipesItem from '@/components/RecipesItem.vue';
 import RecipeItem from '@/components/RecipeItem.vue';
 import FavoriteList from '@/components/FavoriteList.vue';

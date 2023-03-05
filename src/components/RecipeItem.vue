@@ -69,9 +69,11 @@
 import { onBeforeMount, reactive, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from '@/core/store';
+
+import type { RecipeInfo } from '@/models';
+
 import SpinnerItem from '@/components/SpinnerItem.vue';
-import { IMG_PATH } from '@/shared/constants';
-import type { RecipeInfo } from '@/types/interfaces';
+import { IMG_PATH } from '@/constants/api-info';
 
 interface RecipeState {
 	recipe: null | RecipeInfo;

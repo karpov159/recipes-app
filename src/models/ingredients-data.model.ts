@@ -1,7 +1,7 @@
 interface IngredientsData {
 	aisle: string;
 	amount: number;
-	consitency: string;
+	consistency: string;
 	id: number;
 	name: string;
 	unit: string;

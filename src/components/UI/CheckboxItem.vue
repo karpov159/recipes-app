@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CuisineData } from '@/types/interfaces';
+import type { CuisineData } from '@/models';
 
 const props = defineProps<{
 	cuisine: CuisineData;

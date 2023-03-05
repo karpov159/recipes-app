@@ -1,4 +1,4 @@
-import type { IngredientsData } from '@/types/interfaces';
+import type { IngredientsData } from '@/models';
 
 interface RecipeInfo {
 	id: number;

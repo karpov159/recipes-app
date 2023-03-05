@@ -1,20 +1,15 @@
 import { createStore, Store as BaseStore } from 'vuex';
-import recipes, {
-	type RecipesState,
-	type Store as RecipesStore,
-} from './recipesModule';
+
+import type { RecipesState } from './modules/recipes/recipes.model';
+import type { Store } from './store.model';
+
+import recipes from './modules/recipes/recipes';
 
 const store: BaseStore<RecipesState> = createStore({
 	modules: {
 		recipes,
 	},
 });
-
-type State = {
-	recipes: RecipesState;
-};
-
-type Store = RecipesStore<Pick<State, 'recipes'>>;
 
 export function useStore() {
 	return store as unknown as Store;

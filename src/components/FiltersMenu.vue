@@ -24,7 +24,8 @@
 <script setup lang="ts">
 import { useStore } from '@/core/store';
 import { reactive } from 'vue';
-import type { CuisineData } from '@/types/interfaces';
+
+import type { CuisineData } from '@/models';
 
 interface StateData {
 	cuisineList: Record<string, CuisineData>;
