@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import { MAIN, RECIPE_PAGE, FAVORITE } from '@/core/config/RoutesConfig';
 import { MainPage } from '@/pages';
-import RecipesItem from '@/components/RecipesItem.vue';
+import RecipesList from '@/components/recipes-list/recipes-list.vue';
 import RecipeItem from '@/components/RecipeItem.vue';
 import FavoriteList from '@/components/FavoriteList.vue';
 
@@ -15,7 +15,7 @@ const router = createRouter({
 			children: [
 				{
 					path: '/',
-					component: RecipesItem,
+					component: RecipesList,
 				},
 				{
 					path: RECIPE_PAGE,
